@@ -1,3 +1,4 @@
+import math
 import random
 
 
@@ -73,39 +74,54 @@ def generate_primes():
   print(f'Сгенерированы простые числа: a = {a}, b = {b}, модуль p = {p}')
   return a, b, p
 
+  import math
+
+
+def baby_step_giant_step(a, y, p):
+    m = math.ceil(math.sqrt(p))
+
+    baby_steps = {}
+    curr = y % p
+    for j in range(m):
+        baby_steps[curr] = j
+        curr = (curr * a) % p
+        
+    a_m = fast_pow(a, m, p)
+    
+    giant_step = a_m
+    for i in range(1, m + 1):
+        if giant_step in baby_steps:
+            j = baby_steps[giant_step]
+            x = i * m - j
+            return x
+        giant_step = (giant_step * a_m) % p
+        
+    return None
+
 
 if __name__ == '__main__':
-  print('Выберите режим работы:')
-  print('1. Ввод с клавиатуры')
-  print('2. Случайная генерация')
-  print('3. Генерация простых чисел')
+    print('Выберите режим работы:')
+    print('1. Ввод с клавиатуры')
+    print('2. Автоматическая генерация')
+    choice = input('Ваш выбор (1/2): ')
 
-  choice = input('Ваш выбор (1/2/3): ')
+    if choice == '1':
+        a = int(input('Введите a: '))
+        y = int(input('Введите y: '))
+        p = int(input('Введите p: '))
+    else:
+        p = 101
+        a = 2
+        x = random.randint(1, p-1)
+        y = fast_pow(a, x, p)
+        print(f'Сгенерированы параметры: a={a}, p={p}. Получен y={y} (для x={x})')
 
-  if choice == '1':
-    a, b, p = input_from_keyboard()
-  elif choice == '2':
-    a, b, p = generate_random()
-  else:
-    a, b, p = generate_primes()
-
-  print('\n--- Результаты выполнения ---')
-  y_pow = fast_pow(a, b, p)
-  print(f'1) Быстрое возведение: {a}^{b} mod {p} = {y_pow}')
-
-  is_prime_a = ferma_test(a)
-  is_prime_b = ferma_test(b)
-  print(
-      f'2) Тест Ферма для a ({a}): {"простое" if is_prime_a else "составное"}'
-  )
-  print(
-      f'   Тест Ферма для b ({b}): {"простое" if is_prime_b else "составное"}'
-  )
-
-  gcd_val, x, y = gcd_extended(a, b)
-  print(f'3) Обобщенный алгоритм Евклида для ({a}, {b}):')
-  print(
-      f'   НОД({a}, {b}) = {gcd_val}, коэффициенты: x = {x}, y = {y} (Проверка:'
-      f' {a}*({x}) + {b}*({y}) = {a*x + b*y})'
-  )
-  
+    print(f'\nЗапуск поиска дискретного логарифма для {a}^x = {y} (mod {p})...')
+    result = baby_step_giant_step(a, y, p)
+    
+    if result is not None:
+        print(f'Успешно! Найденное x = {result}')
+        if fast_pow(a, result, p) == y:
+            print('Проверка пройдена: a^x mod p == y')
+    else:
+        print('Решение не найдено (возможно, a не является первообразным корнем).')
