@@ -21,22 +21,17 @@ def gcd_extended(a, b):
   return u1, u2, u3
 
 
-def ferma_test(p, k=50):
-  if p <= 1:
-    return False
-  if p == 2:
+def ferma_test(p):
+    if p <= 1: return False
+    if p == 2 or p == 3: return True
+    if p % 2 == 0: return False
+
+    for _ in range(100):
+        a = random.randint(2, p - 2)
+        if fast_pow(a, p - 1, p) != 1:
+            return False
+            
     return True
-  if p % 2 == 0:
-    return False
-
-  for _ in range(k):
-    a = random.randint(2, p - 2)
-    if gcd_extended(a, p)[0] != 1:
-      return False
-    if fast_pow(a, p - 1, p) != 1:
-      return False
-  return True
-
 
 def input_from_keyboard():
   print('\n[Ввод с клавиатуры]')
@@ -51,7 +46,7 @@ def generate_random():
   a = random.randint(10, 100)
   b = random.randint(10, 100)
   p = random.randint(100, 1000)
-  print('сгенерировано: a = {a}, b = {b}, p = {p}')
+  print(f'сгенерировано: a = {a}, b = {b}, p = {p}')
   return a, b, p
 
 
@@ -75,37 +70,86 @@ def generate_primes():
 
 
 if __name__ == '__main__':
-  print('Выберите режим работы:')
-  print('1. Ввод с клавиатуры')
-  print('2. Случайная генерация')
-  print('3. Генерация простых чисел')
+    print('1. Быстрое возведение в степень')
+    print('2. Тест простоты (Ферма)')
+    print('3. Обобщенный алгоритм Евклида')
+    choice_action = input('Ваш выбор : ')
 
-  choice = input('Ваш выбор (1/2/3): ')
+    print('1. Ввод с клавиатуры')
+    print('2. Случайная генерация')
+    print('3. Генерация простых чисел (для Евклида)')
+    choice_data = input('Ваш выбор : ')
 
-  if choice == '1':
-    a, b, p = input_from_keyboard()
-  elif choice == '2':
-    a, b, p = generate_random()
-  else:
-    a, b, p = generate_primes()
+    if choice_action == '3':
+        if choice_data == '1':
+            a = int(input('Введите a: '))
+            b = int(input('Введите b: '))
+        elif choice_data == '2':
+            a, b = random.randint(10, 100), random.randint(10, 100)
+        else:
+            a, b, p = generate_primes()
+        p = None
+        gcd_val, x, y = gcd_extended(a, b)
+        print(f'{gcd_val}, x={x}, y={y}')  
 
-  print('\n--- Результаты выполнения ---')
-  y_pow = fast_pow(a, b, p)
-  print(f'1) Быстрое возведение: {a}^{b} mod {p} = {y_pow}')
+    if choice_action == '2':
+      if choice_data == '1':
+        p = int(input('Введите модуль p: '))
+        is_p = ferma_test(p)
+        print(f'Тест Ферма для : {"простое" if is_p else "составное"}')
+      elif choice_data == '2':
+        p = generate_random()
+        is_p = ferma_test(p)
+        print(f'Тест Ферма для : {"простое" if is_p else "составное"}')
+      else:
+        p = get_random_prime()
+        is_p = ferma_test(p)
+        print(f'Тест Ферма для : {"простое" if is_p else "составное"}')
 
-  is_prime_a = ferma_test(a)
-  is_prime_b = ferma_test(b)
-  print(
-      f'2) Тест Ферма для a ({a}): {"простое" if is_prime_a else "составное"}'
-  )
-  print(
-      f'   Тест Ферма для b ({b}): {"простое" if is_prime_b else "составное"}'
-  )
+    if choice_action == '1':
+        if choice_data == '1':
+            a = int(input('Введите a: '))
+            b = int(input('Введите b: '))
+            p = int(input('Введите модуль p: '))
+        elif choice_data == '2':
+            a, b, c = random.randint(10, 100), random.randint(10, 100), random.randint(10, 100)
+        else:
+            a, b, c = generate_primes()
+        y_pow = fast_pow(a, b, p)
+        print(f'Результат: {a}^{b} mod {p} = {y_pow}')
 
-  gcd_val, x, y = gcd_extended(a, b)
-  print(f'3) Обобщенный алгоритм Евклида для ({a}, {b}):')
-  print(
-      f'   НОД({a}, {b}) = {gcd_val}, коэффициенты: x = {x}, y = {y} (Проверка:'
-      f' {a}*({x}) + {b}*({y}) = {a*x + b*y})'
-  )
-  
+    # else:
+    #     if choice_data == '1':
+    #         a = int(input('Введите a: '))
+    #         b = int(input('Введите b: '))
+    #         p = int(input('Введите модуль p: '))
+    #     elif choice_data == '2':
+    #         a, b, p = generate_random()
+    #     else:
+    #         a, b, p = generate_primes()
+
+    # print('\n--- Результаты выполнения ---')
+    # if choice_action == '1':
+    #     y_pow = fast_pow(a, b, p)
+    #     print(f'Результат: {a}^{b} mod {p} = {y_pow}')
+        
+    # elif choice_action == '2':
+    #   if choice_data == '1':
+    #     p = int(input('Введите модуль p: '))
+    #     is_p = ferma_test(p)
+    #     print(f'Тест Ферма для : {"простое" if is_p else "составное"}')
+    #   elif choice_data == '2':
+    #     p = generate_random()
+    #     is_p = ferma_test(p)
+    #     print(f'Тест Ферма для : {"простое" if is_p else "составное"}')
+    #   else:
+    #     p = get_random_prime()
+    #     is_p = ferma_test(p)
+    #     print(f'Тест Ферма для : {"простое" if is_p else "составное"}')
+
+
+
+        
+    # elif choice_action == '3':
+    #     gcd_val, x, y = gcd_extended(a, b)
+    #     print(f'{gcd_val}, x={x}, y={y}')  

@@ -22,21 +22,17 @@ def gcd_extended(a, b):
   return u1, u2, u3
 
 
-def ferma_test(p, k=50):
-  if p <= 1:
-    return False
-  if p == 2:
-    return True
-  if p % 2 == 0:
-    return False
+def ferma_test(p):
+    if p <= 1: return False
+    if p == 2 or p == 3: return True
+    if p % 2 == 0: return False
 
-  for _ in range(k):
-    a = random.randint(2, p - 2)
-    if gcd_extended(a, p)[0] != 1:
-      return False
-    if fast_pow(a, p - 1, p) != 1:
-      return False
-  return True
+    for _ in range(100):
+        a = random.randint(2, p - 2)
+        if fast_pow(a, p - 1, p) != 1:
+            return False
+            
+    return True
 
 
 def input_from_keyboard():
@@ -78,32 +74,61 @@ def generate_primes():
 
 
 def baby_step_giant_step(a, y, p):
-    m = math.ceil(math.sqrt(p))
-
-    baby_steps = {}
-    curr = y % p
-    for j in range(m):
-        baby_steps[curr] = j
-        curr = (curr * a) % p
-        
-    a_m = fast_pow(a, m, p)
+    root = int(math.isqrt(p))
+    if root * root < p:
+        root += 1
     
-    giant_step = a_m
-    for i in range(1, m + 1):
-        if giant_step in baby_steps:
-            j = baby_steps[giant_step]
-            x = i * m - j
-            return x
-        giant_step = (giant_step * a_m) % p
+    m, k = 0, 0
+    if root * root == p:
+        m = root
+        k = root
+    else:
+        s = root + root
+        m = 1
+        k = s - m
+        while m * k <= p:
+            m += 1
+            k = s - m
+            
+    print(f"m = {m}")
+    print(f"k = {k}")
+    
+    lit = []
+    big = []
+    result = []
+
+    for j in range(m):
+        x = (fast_pow(y, 1, p) * fast_pow(a, j, p)) % p
+        lit.append(x)
         
-    return None
+    for i in range(1, k + 1):
+        x = fast_pow(a, m * i, p)
+        big.append(x)
+        
+    pos = {}
+    for idx, val in enumerate(big):
+        if val not in pos:
+            pos[val] = []
+        pos[val].append(idx)
+        
+    count = 1
+    for j in range(len(lit)):
+        val_lit = lit[j]
+        if val_lit in pos:
+            for i in pos[val_lit]:
+                x = (i + 1) * m - j
+                print(f"X({count}) = {x}")
+                result.append(x)
+                count += 1
+                
+    return result
 
 
 if __name__ == '__main__':
     print('Выберите режим работы:')
     print('1. Ввод с клавиатуры')
     print('2. Автоматическая генерация')
-    choice = input('Ваш выбор (1/2): ')
+    choice = input('Ваш выбор : ')
 
     if choice == '1':
         a = int(input('Введите a: '))
@@ -114,14 +139,12 @@ if __name__ == '__main__':
         a = 2
         x = random.randint(1, p-1)
         y = fast_pow(a, x, p)
-        print(f'Сгенерированы параметры: a={a}, p={p}. Получен y={y} (для x={x})')
+        print(f'Параметры: a={a}, p={p}. Получен y={y} (для x={x})')
 
-    print(f'\nЗапуск поиска дискретного логарифма для {a}^x = {y} (mod {p})...')
     result = baby_step_giant_step(a, y, p)
     
     if result is not None:
-        print(f'Успешно! Найденное x = {result}')
-        if fast_pow(a, result, p) == y:
-            print('Проверка пройдена: a^x mod p == y')
+        print(f'x = {result}')
+        # if fast_pow(a, result[0], p) == y and fast_pow(a, result[1], p):
     else:
         print('Решение не найдено (возможно, a не является первообразным корнем).')
