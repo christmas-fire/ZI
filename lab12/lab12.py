@@ -54,7 +54,7 @@ class Card:
     def __repr__(self):
         return f"{self.rank}{self.suit}"
 
-class BalatroMentalPoker(tk.Tk):
+class MentalPoker(tk.Tk):
     COLOR_BG = "#1e2c26"
     COLOR_PANEL = "#253b34"
     COLOR_CARD_BG = "#fefcf4"
@@ -98,7 +98,7 @@ class BalatroMentalPoker(tk.Tk):
         header_frame.pack(fill=tk.X, side=tk.TOP, padx=10, pady=(10, 5))
 
         title = tk.Label(
-            header_frame, text="МЕНТАЛЬНЫЙ ПОКЕР (TEXAS HOLD'EM SRA)", 
+            header_frame, text="МЕНТАЛЬНЫЙ ПОКЕР (TEXAS HOLD'EM)", 
             bg=self.COLOR_PANEL, fg=self.COLOR_GOLD, font=("Impact", 18)
         )
         title.pack(side=tk.LEFT, padx=10, pady=10)
@@ -321,6 +321,6 @@ class BalatroMentalPoker(tk.Tk):
             child.configure(text=text, command=command, bg=color, fg=fg)
 
 if __name__ == "__main__":
-    app = BalatroMentalPoker()
+    app = MentalPoker()
     app.start_new_game()
     app.mainloop()
